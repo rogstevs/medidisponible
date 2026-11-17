@@ -1,0 +1,576 @@
+/* ==========================================================================
+   MEDIDISPONIBLE - SISTEMA DE DISEÑO Y HOJA DE ESTILOS (LANDING PAGE)
+   ==========================================================================
+   Proyecto: MediDisponible - Plataforma de Consulta de Medicamentos
+   Descripción: Estilos personalizados, diseño responsivo, componentes visuales,
+                microinteracciones, mapa interactivo y sistema de modales.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. IMPORTACIÓN DE FUENTES & VARIABLES DE DISEÑO (CSS CUSTOM PROPERTIES)
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Paleta cromática principal */
+  --color-primary: #00a0e9;         /* Azul MediDisponible institucional */
+  --color-primary-hover: #008ccf;   /* Azul para estados hover */
+  --color-primary-dark: #006699;    /* Azul profundo para contrastes */
+  --color-primary-light: #e0f2fe;   /* Azul muy tenue para fondos activos */
+  
+  /* Tonos complementarios y de acento */
+  --color-accent-amber: #f5a623;    /* Ámbar / Naranja de llamada a la acción */
+  --color-accent-hover: #e09419;    /* Ámbar oscuro hover */
+  --color-navy: #0f2942;            /* Azul marino para textos destacados */
+  --color-navy-dark: #0a1b2d;       /* Azul marino profundo */
+  
+  /* Escala de grises y neutros */
+  --color-bg-light: #f8fafd;        /* Fondo general suave */
+  --color-card-bg: #ffffff;         /* Fondo blanco para tarjetas */
+  --color-border: #e2e8f0;          /* Borde sutil estándar */
+  --color-border-subtle: #edf2f7;   /* Borde ultraliviano */
+  --color-text-main: #1e293b;       /* Texto slate-800 de alta legibilidad */
+  --color-text-muted: #64748b;      /* Texto secundario slate-500 */
+
+  /* Sombras de elevación (Box Shadows) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 160, 233, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 35px -10px rgba(15, 41, 66, 0.12);
+  --pill-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  --pill-shadow-hover: 0 8px 22px rgba(0, 160, 233, 0.2);
+
+  /* Transiciones estándar */
+  --transition-fast: all 0.15s ease-in-out;
+  --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   2. REGLAS BASE & TIPOGRAFÍA
+   -------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth; /* Desplazamiento fluido entre anclas de la landing page */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--color-text-main);
+  background-color: var(--color-bg-light);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Offset para el desplazamiento de anclas debido al encabezado sticky */
+section[id] {
+  scroll-margin-top: 5.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   3. ELEMENTOS DECORATIVOS DE FONDO
+   -------------------------------------------------------------------------- */
+/* Acento decorativo diagonal en la parte superior derecha */
+.header-bg-accent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 620px;
+  background: radial-gradient(circle at 80% 20%, rgba(0, 160, 233, 0.12) 0%, rgba(240, 249, 255, 0.05) 70%, transparent 100%);
+  clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Resplandor decorativo suave para secciones clave */
+.ambient-glow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(0, 160, 233, 0.08) 0%, rgba(0, 160, 233, 0) 70%);
+  border-radius: 9999px;
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* --------------------------------------------------------------------------
+   4. NAVEGACIÓN & CABECERA STICKY (GLASSMORPHISM)
+   -------------------------------------------------------------------------- */
+.sticky-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+  transition: var(--transition-base);
+}
+
+.sticky-navbar.scrolled {
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+  background-color: rgba(255, 255, 255, 0.98);
+}
+
+/* Enlaces estilo píldora de navegación */
+.nav-pill {
+  transition: var(--transition-base);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 9999px;
+  font-weight: 500;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-decoration: none;
+}
+
+.nav-pill:hover {
+  transform: translateY(-1px);
+  color: var(--color-primary);
+  border-color: rgba(0, 160, 233, 0.3);
+  box-shadow: var(--pill-shadow-hover);
+  background-color: #ffffff;
+}
+
+/* Estado activo para el menú según la sección visible */
+.nav-pill.active {
+  background-color: var(--color-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 4px 14px rgba(0, 160, 233, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   5. BOTONES DE ACCIÓN (CTAS)
+   -------------------------------------------------------------------------- */
+/* Botón Principal (Azul MediDisponible) */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #008ccf 100%);
+  color: #ffffff;
+  border-radius: 9999px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+  box-shadow: 0 4px 14px rgba(0, 160, 233, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #00b0ff 0%, var(--color-primary) 100%);
+  box-shadow: 0 6px 20px rgba(0, 160, 233, 0.42);
+  transform: translateY(-1.5px);
+  color: #ffffff;
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Botón Secundario / Ámbar (Destacado del Mockup) */
+.btn-amber {
+  background: linear-gradient(135deg, var(--color-accent-amber) 0%, #e89512 100%);
+  color: #ffffff;
+  border-radius: 9999px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+  box-shadow: 0 4px 15px rgba(245, 166, 35, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-amber:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, var(--color-accent-amber) 100%);
+  box-shadow: 0 6px 22px rgba(245, 166, 35, 0.48);
+  transform: translateY(-1.5px);
+  color: #ffffff;
+}
+
+.btn-amber:active {
+  transform: translateY(0);
+}
+
+/* Botón Esquematizado (Outline) */
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-outline:hover {
+  background-color: var(--color-primary-light);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   6. TARJETAS & CONTENEDORES (CARDS & CONTAINERS)
+   -------------------------------------------------------------------------- */
+.mockup-card {
+  background: var(--color-card-bg);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  transition: var(--transition-base);
+}
+
+.mockup-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(203, 213, 225, 0.9);
+}
+
+/* Tarjeta de Característica / Beneficio */
+.feature-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.75rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: var(--transition-smooth);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px -6px rgba(0, 160, 233, 0.12);
+  border-color: rgba(0, 160, 233, 0.35);
+}
+
+/* Tarjeta informativa de contacto azul institucional */
+.contact-info-card {
+  background: linear-gradient(145deg, #00a0e9 0%, #0077b6 100%);
+  color: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 12px 30px -4px rgba(0, 160, 233, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   7. FORMULARIOS, BUSCADOR & FILTROS
+   -------------------------------------------------------------------------- */
+/* Píldoras de título para campos de búsqueda */
+.filter-tag-pill {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border-radius: 9999px;
+  padding: 0.45rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 3px 10px rgba(0, 160, 233, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Chips de sugerencias rápidas de búsqueda */
+.search-chip {
+  background-color: #ffffff;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  color: #475569;
+  font-size: 0.775rem;
+  font-weight: 500;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.search-chip:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+/* Inputs de texto con foco resaltado */
+.input-field {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1.5px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #1e293b;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  transition: var(--transition-fast);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 160, 233, 0.18);
+}
+
+/* --------------------------------------------------------------------------
+   8. TABLA DE RESULTADOS & BADGES DE ESTADO
+   -------------------------------------------------------------------------- */
+.pharmacy-table-row {
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.pharmacy-table-row:hover {
+  background-color: rgba(224, 242, 254, 0.4);
+}
+
+.pharmacy-table-row.selected {
+  background-color: rgba(224, 242, 254, 0.8);
+  border-left: 4px solid var(--color-primary);
+}
+
+/* Insignias de disponibilidad */
+.badge-available {
+  background-color: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.725rem;
+  padding: 0.2rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.badge-cancelled {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  font-weight: 500;
+  font-size: 0.725rem;
+  padding: 0.2rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   9. MAPA INTERACTIVO (LEAFLET)
+   -------------------------------------------------------------------------- */
+#leaflet-map {
+  width: 100%;
+  height: 480px;
+  z-index: 10;
+  border-radius: 0.875rem;
+}
+
+/* Pin personalizado con SVG y efecto de pulsación */
+.custom-pin {
+  width: 30px;
+  height: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444' stroke='%23b91c1c' stroke-width='1'%3E%3Cpath d='M12 0c-4.418 0-8 3.582-8 8 0 5.25 7 13 8 16 1-3 8-10.75 8-16 0-4.418-3.582-8-8-8zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.custom-pin:hover,
+.custom-pin.selected {
+  transform: scale(1.3) translateY(-6px);
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45));
+}
+
+/* Popup de Leaflet refinado */
+.leaflet-popup-content-wrapper {
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  font-family: inherit;
+  border: 1px solid #e2e8f0;
+}
+
+.leaflet-popup-content {
+  margin: 0.75rem 1rem;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   10. PASOS & FLUJO (CÓMO FUNCIONA)
+   -------------------------------------------------------------------------- */
+.step-number-badge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #0077b6 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 3px 10px rgba(0, 160, 233, 0.3);
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   11. PREGUNTAS FRECUENTES (FAQ ACCORDION & TARJETAS)
+   -------------------------------------------------------------------------- */
+.faq-accordion-item {
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 0.875rem;
+  background-color: #ffffff;
+  overflow: hidden;
+  transition: var(--transition-fast);
+}
+
+.faq-accordion-item:hover {
+  border-color: rgba(0, 160, 233, 0.4);
+}
+
+.faq-accordion-btn {
+  width: 100%;
+  text-align: left;
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-weight: 600;
+  color: #0f2942;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.faq-accordion-btn svg {
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.faq-accordion-btn[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.faq-accordion-content {
+  padding: 0 1.25rem 1.25rem 1.25rem;
+  color: #475569;
+  font-size: 0.925rem;
+  line-height: 1.6;
+  border-top: 1px solid rgba(241, 245, 249, 0.8);
+}
+
+/* --------------------------------------------------------------------------
+   12. SISTEMA DE MODALES (VENTANAS EMERGENTES)
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: opacity 0.25s ease;
+}
+
+.modal-container {
+  animation: modalEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   13. BOTÓN FLOTANTE VOLVER ARRIBA (BACK TO TOP)
+   -------------------------------------------------------------------------- */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 160, 233, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 35;
+  transition: var(--transition-base);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+}
+
+.back-to-top-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: 0 6px 20px rgba(0, 160, 233, 0.5);
+  transform: translateY(-2px);
+}
+
+/* --------------------------------------------------------------------------
+   14. ANIMACIONES & MICROINTERACCIONES
+   -------------------------------------------------------------------------- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* --------------------------------------------------------------------------
+   15. AJUSTES RESPONSIVOS (MEDIA QUERIES)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .header-bg-accent {
+    width: 90%;
+    height: 400px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 85%);
+  }
+
+  #leaflet-map {
+    height: 360px;
+  }
+
+  .back-to-top-btn {
+    bottom: 1.25rem;
+    right: 1.25rem;
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}

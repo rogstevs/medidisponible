@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- ==========================================================================
+       METADATOS BÁSICOS & CONFIGURACIÓN DEL NAVEGADOR
+       ========================================================================== -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MediDisponible: Consulta la disponibilidad de tus medicamentos formulados en puntos de dispensación y farmacias antes de salir de casa.">
+  <meta name="keywords" content="medicamentos, farmacias, salud, dispensación, disponibilidad, Bogotá, EPS, droguerías">
+  <meta name="author" content="Equipo MediDisponible">
+  <title>MediDisponible - Encuentra tus medicamentos antes de salir de casa</title>
+  
+  <!-- Favicon e ícono institucional -->
+  <link rel="icon" type="image/png" href="assets/logo-header.png">
+
+  <!-- ==========================================================================
+       ESTILOS EXTERNOS: TAILWIND CSS & LEAFLET MAP
+       ========================================================================== -->
+  <!-- Tailwind CSS CDN para maquetación ágil con clases de utilidad -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Leaflet CSS y JS para el mapa interactivo georreferenciado de farmacias -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- ==========================================================================
+       HOJA DE ESTILOS PERSONALIZADA (LANDING PAGE & SISTEMA DE DISEÑO)
+       ========================================================================== -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-[#f8fafd] text-slate-800 antialiased flex flex-col min-h-screen relative selection:bg-sky-500 selection:text-white">
+
+  <!-- Elemento decorativo visual superior derecho del mockup -->
+  <div class="header-bg-accent" aria-hidden="true"></div>
+
+  <!-- ==========================================================================
+       CABECERA Y BARRA DE NAVEGACIÓN STICKY (LANDING PAGE HEADER)
+       ========================================================================== -->
+  <header id="main-header" class="sticky-navbar w-full">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+      
+      <!-- Logotipo principal de la plataforma con enlace al inicio -->
+      <a href="#inicio" class="flex items-center gap-2 group transition focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-lg p-1" aria-label="Ir a la sección de Inicio de MediDisponible">
+        <img src="assets/logo-header.png" alt="Logotipo MediDisponible" class="h-11 sm:h-13 w-auto object-contain transition-transform group-hover:scale-105">
+      </a>
+
+      <!-- Menú de navegación principal en escritorio (Smooth Scroll Navigation) -->
+      <nav class="hidden md:flex items-center gap-2 lg:gap-3" aria-label="Navegación principal">
+        <a href="#inicio" class="nav-pill active bg-white px-4 py-2 text-sm" data-nav-link="inicio">
+          <span>Inicio</span>
+        </a>
+        <a href="#beneficios" class="nav-pill bg-white px-4 py-2 text-sm" data-nav-link="beneficios">
+          <span>Beneficios</span>
+        </a>
+        <a href="#buscar" class="nav-pill bg-white px-4 py-2 text-sm" data-nav-link="buscar">
+          <span>Buscador</span>
+        </a>
+        <a href="#como-funciona" class="nav-pill bg-white px-4 py-2 text-sm" data-nav-link="como-funciona">
+          <span>¿Cómo funciona?</span>
+        </a>
+        <a href="#faq" class="nav-pill bg-white px-4 py-2 text-sm" data-nav-link="faq">
+          <span>Preguntas</span>
+        </a>
+        <a href="#contacto" class="nav-pill bg-white px-4 py-2 text-sm" data-nav-link="contacto">
+          <span>Contacto</span>
+        </a>
+      </nav>
+
+      <!-- Botón de llamada a la acción directo en la barra superior -->
+      <div class="hidden sm:flex items-center gap-3">
+        <a href="#buscar" class="btn-primary px-5 py-2.5 text-sm flex items-center gap-2 shadow-md">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span>Consultar Stock</span>
+        </a>
+      </div>
+
+      <!-- Botón hamburguesa para dispositivos móviles -->
+      <div class="flex md:hidden">
+        <button id="mobile-menu-toggle" type="button" class="p-2 rounded-lg text-slate-600 hover:text-sky-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400" aria-label="Abrir menú de navegación" aria-expanded="false">
+          <svg id="hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Menú desplegable para móviles -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-md px-4 pt-3 pb-5 space-y-2">
+      <a href="#inicio" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:text-sky-600 hover:bg-sky-50 rounded-lg mobile-nav-link">Inicio</a>
+      <a href="#beneficios" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:text-sky-600 hover:bg-sky-50 rounded-lg mobile-nav-link">Beneficios</a>
+      <a href="#buscar" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:text-sky-600 hover:bg-sky-50 rounded-lg mobile-nav-link">Buscador de Farmacias</a>
+      <a href="#como-funciona" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:text-sky-600 hover:bg-sky-50 rounded-lg mobile-nav-link">¿Cómo funciona?</a>
+      <a href="#faq" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:text-sky-600 hover:bg-sky-50 rounded-lg mobile-nav-link">Preguntas Frecuentes</a>
+      <a href="#contacto" class="block px-4 py-2 text-sm font-medium text-slate-700 hover:text-sky-600 hover:bg-sky-50 rounded-lg mobile-nav-link">Contacto y Soporte</a>
+      <div class="pt-2">
+        <a href="#buscar" class="w-full btn-primary px-4 py-2.5 text-sm text-center mobile-nav-link">
+          Consultar Medicamento
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       CONTENIDO PRINCIPAL DE LA LANDING PAGE
+       ========================================================================== -->
+  <main class="flex-grow w-full z-10">
+
+    <!-- ======================================================================
+         SECCIÓN 1: HERO PRINCIPAL (PORTADA / VALUE PROPOSITION)
+         ====================================================================== -->
+    <section id="inicio" class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14 pb-16">
+      
+      <!-- Contenedor en dos columnas: Información principal y Collage gráfico -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        
+        <!-- Columna Izquierda: Mensaje de valor y buscador rápido integrado -->
+        <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+          
+          <!-- Insignia informativa de la plataforma -->
+          <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-200/80 px-4 py-1.5 rounded-full text-xs sm:text-sm text-sky-800 font-semibold shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+            <span>Plataforma Cívica de Salud &bull; Consulta Gratuita y Segura</span>
+          </div>
+
+          <!-- Título llamativo de impacto -->
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-[1.15] tracking-tight">
+            Encuentra tus medicamentos <span class="text-sky-600">antes de salir</span> de casa.
+          </h1>
+
+          <!-- Descripción y propuesta de solución -->
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+            Con <strong>MediDisponible</strong> puedes consultar en qué puntos de dispensación están disponibles tus medicamentos formulados, evitando viajes en vano, filas y optimizando tu tiempo.
+          </p>
+
+          <!-- BUSCADOR RÁPIDO HERO: Permite consultar al instante sin rodeos -->
+          <div class="bg-white rounded-2xl p-2.5 sm:p-3 shadow-lg border border-slate-200/90 max-w-xl mx-auto lg:mx-0">
+            <div class="flex flex-col sm:flex-row items-center gap-2">
+              <div class="relative w-full flex-grow">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </span>
+                <input 
+                  type="text" 
+                  id="home-search-input" 
+                  placeholder="Ej. Losartán, Ibuprofeno, Acetaminofén..." 
+                  class="w-full pl-10 pr-4 py-3 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 border border-transparent text-sm sm:text-base"
+                  aria-label="Nombre del medicamento a consultar"
+                >
+              </div>
+              <button 
+                id="home-search-btn" 
+                class="w-full sm:w-auto btn-primary px-7 py-3 text-sm sm:text-base font-semibold whitespace-nowrap"
+              >
+                Buscar ahora
+              </button>
+            </div>
+            
+            <!-- Sugerencias populares de consulta en un solo clic -->
+            <div class="flex flex-wrap items-center gap-1.5 pt-3 px-1 border-t border-slate-100 mt-2 text-xs text-slate-500">
+              <span class="font-medium mr-1">Populares:</span>
+              <button type="button" class="search-chip" data-quick-med="Losartán">Losartán 50mg</button>
+              <button type="button" class="search-chip" data-quick-med="Ibuprofeno">Ibuprofeno</button>
+              <button type="button" class="search-chip" data-quick-med="Metformina">Metformina</button>
+              <button type="button" class="search-chip" data-quick-med="Acetaminofén">Acetaminofén</button>
+            </div>
+          </div>
+
+          <!-- Botones de navegación adicionales en el Hero -->
+          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+            <a href="#buscar" class="btn-primary px-6 py-3 text-sm font-semibold">
+              Explorar Mapa y Farmacias
+            </a>
+            <a href="#como-funciona" class="btn-outline px-6 py-3 text-sm font-semibold">
+              ¿Cómo Funciona?
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Columna Derecha: Tarjetas combinadas con imágenes del mockup de Figma -->
+        <div class="lg:col-span-5 flex flex-col items-center justify-center relative">
+          
+          <!-- Tarjeta principal con logotipo oficial -->
+          <div class="w-full max-w-sm bg-white rounded-3xl p-6 shadow-xl border border-slate-200/80 relative z-10 transition-transform duration-300 hover:scale-[1.02]">
+            <img src="assets/hero-logo-badge.jpg" alt="MediDisponible - Insignia Oficial" class="w-full h-auto object-contain rounded-xl">
+            
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span class="flex items-center gap-1 font-semibold text-sky-700">
+                <svg class="w-4 h-4 text-sky-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Datos referenciales
+              </span>
+              <span>Cobertura Bogotá</span>
+            </div>
+          </div>
+
+          <!-- Tarjeta flotante superpuesta con foto de medicamentos -->
+          <div class="w-48 sm:w-56 rounded-2xl overflow-hidden shadow-2xl border-4 border-white absolute -bottom-8 -left-2 sm:-left-6 z-20 hidden sm:block">
+            <img src="assets/hero-pills.jpg" alt="Medicamentos y cápsulas" class="w-full h-auto object-cover">
+          </div>
+
+          <!-- Microtarjeta flotante de confianza -->
+          <div class="bg-white/95 backdrop-blur-sm border border-slate-200 shadow-lg rounded-2xl p-3 absolute -top-4 -right-2 sm:-right-4 z-20 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg">
+              ✓
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-800">Inventario Activo</p>
+              <p class="text-[11px] text-slate-500">Actualizado recientemente</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Barra de métricas y confianza (Trust Bar) -->
+      <div class="mt-16 pt-8 border-t border-slate-200/80 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="p-3">
+          <p class="text-2xl sm:text-3xl font-extrabold text-sky-600">+15.000</p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">Consultas mensuales</p>
+        </div>
+        <div class="p-3">
+          <p class="text-2xl sm:text-3xl font-extrabold text-slate-800">100%</p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">Libre y gratuito</p>
+        </div>
+        <div class="p-3">
+          <p class="text-2xl sm:text-3xl font-extrabold text-sky-600">GeoMap</p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">Ubicación exacta y rutas</p>
+        </div>
+        <div class="p-3">
+          <p class="text-2xl sm:text-3xl font-extrabold text-slate-800">0 Pasos</p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">Sin registros obligatorios</p>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ======================================================================
+         SECCIÓN 2: BENEFICIOS DESTACADOS & QUÉ PUEDES HACER
+         ====================================================================== -->
+    <section id="beneficios" class="bg-white py-16 border-y border-slate-200/70">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        
+        <!-- Encabezado de la sección -->
+        <div class="text-center max-w-3xl mx-auto space-y-3">
+          <h2 class="text-xs font-bold text-sky-600 uppercase tracking-wider">Beneficios Principales</h2>
+          <p class="text-2xl sm:text-3xl font-extrabold text-slate-900">
+            ¿Qué puedes hacer con MediDisponible?
+          </p>
+          <p class="text-sm sm:text-base text-slate-600">
+            Diseñamos una experiencia ágil para que la falta de medicamentos no signifique horas perdidas en transporte.
+          </p>
+        </div>
+
+        <!-- Cuadrícula de 3 tarjetas de beneficios -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          <!-- Beneficio 1 -->
+          <div class="feature-card flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900">Consultar disponibilidad</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Verifica de antemano el stock reportado de tu medicamento con su concentración y presentación específica.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-100">
+              <span class="text-xs font-semibold text-sky-600 flex items-center gap-1">
+                Ahorra desplazamientos innecesarios &rarr;
+              </span>
+            </div>
+          </div>
+
+          <!-- Beneficio 2 -->
+          <div class="feature-card flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900">Identificar puntos en mapa</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Localiza las farmacias más cercanas con direcciones exactas, números de teléfono y horarios de apertura.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-100">
+              <span class="text-xs font-semibold text-sky-600 flex items-center gap-1">
+                Visualización en tiempo real &rarr;
+              </span>
+            </div>
+          </div>
+
+          <!-- Beneficio 3 -->
+          <div class="feature-card flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+              <h3 class="text-lg font-bold text-slate-900">Mayor tranquilidad familiar</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Planifica la entrega de tratamientos para pacientes crónicos y adultos mayores con información clara y organizada.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-100">
+              <span class="text-xs font-semibold text-amber-600 flex items-center gap-1">
+                Salud al alcance de todos &rarr;
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Banner de aviso legal y recomendación del Figma Mockup -->
+        <div class="max-w-4xl mx-auto bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+          <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <strong>Aviso importante:</strong> La disponibilidad puede cambiar dinámicamente según la afluencia de usuarios. Te recomendamos confirmar vía telefónica con el punto de dispensación antes de desplazarte.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ======================================================================
+         SECCIÓN 3: MOTOR DE BÚSQUEDA, TABLA Y MAPA INTERACTIVO
+         ====================================================================== -->
+    <section id="buscar" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      
+      <!-- Encabezado de la sección del Buscador -->
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <span class="inline-block bg-sky-100 text-sky-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full">
+          Consulta en Tiempo Real
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900">
+          Consulta la disponibilidad de tu medicamento
+        </h2>
+        <p class="text-sm sm:text-base text-slate-600">
+          Ingresa el nombre del medicamento o utiliza los filtros para localizar los puntos de entrega autorizados más cercanos.
+        </p>
+      </div>
+
+      <!-- FORMULARIO DE FILTROS: Nombre, Presentación y Ubicación -->
+      <form id="search-form" class="max-w-5xl mx-auto bg-white p-6 sm:p-8 rounded-3xl shadow-md border border-slate-200/80 space-y-6">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Filtro 1: Nombre del Medicamento -->
+          <div class="space-y-2">
+            <label for="input-med-name" class="block">
+              <span class="filter-tag-pill">Nombre del medicamento</span>
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="input-med-name" 
+                placeholder="Ejemplo: Losartán" 
+                value="Losartán"
+                class="w-full px-5 py-3 rounded-full bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white pl-5 pr-10"
+              >
+              <svg class="w-5 h-5 absolute right-4 top-3 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+          </div>
+
+          <!-- Filtro 2: Presentación / Concentración -->
+          <div class="space-y-2">
+            <label for="input-presentation" class="block">
+              <span class="filter-tag-pill">Presentación</span>
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="input-presentation" 
+                placeholder="Ejemplo: 50 mg" 
+                value="50 mg"
+                class="w-full px-5 py-3 rounded-full bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white pl-5 pr-10"
+              >
+              <svg class="w-5 h-5 absolute right-4 top-3 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            </div>
+          </div>
+
+          <!-- Filtro 3: Ubicación o Ciudad -->
+          <div class="space-y-2">
+            <label for="input-location" class="block">
+              <span class="filter-tag-pill">Ubicación</span>
+            </label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="input-location" 
+                placeholder="Ejemplo: Bogotá o Kennedy" 
+                value="Bogotá"
+                class="w-full px-5 py-3 rounded-full bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white pl-5 pr-10"
+              >
+              <svg class="w-5 h-5 absolute right-4 top-3 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Botones de acción del formulario -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <button type="submit" class="w-full sm:w-auto btn-amber px-10 py-3.5 text-base font-semibold shadow-md inline-flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <span>Buscar disponibilidad</span>
+          </button>
+          
+          <button type="button" id="reset-filters-btn" class="w-full sm:w-auto px-6 py-3.5 rounded-full border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+            Limpiar filtros
+          </button>
+        </div>
+
+      </form>
+
+      <!-- BARRA DE RESULTADOS Y SELECTOR DE VISTAS -->
+      <div class="pt-4 space-y-5">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+          
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+            <p id="results-count-text" class="text-slate-800 font-semibold text-sm sm:text-base">
+              Puntos de dispensación encontrados para tu consulta:
+            </p>
+          </div>
+
+          <!-- Selector de Modo de Vista (Dual, Tabla, Mapa) -->
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <label for="view-toggle-select" class="text-xs text-slate-500 font-medium">Modo de vista:</label>
+            <select id="view-toggle-select" class="bg-slate-50 border border-slate-200 shadow-sm rounded-full px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer">
+              <option value="both">Tabla y Mapa (Recomendado)</option>
+              <option value="table">Solo Tabla de farmacias</option>
+              <option value="map">Solo Mapa interactivo</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- VISTA 1: TABLA DE FARMACIAS -->
+        <div id="table-results-view" class="mockup-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50/90 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <th class="py-3.5 px-4">Punto / Farmacia</th>
+                  <th class="py-3.5 px-4">Código</th>
+                  <th class="py-3.5 px-4">Medicamento</th>
+                  <th class="py-3.5 px-4">Presentación</th>
+                  <th class="py-3.5 px-4">Unds disponibles</th>
+                  <th class="py-3.5 px-4">Dirección</th>
+                </tr>
+              </thead>
+              <tbody id="results-tbody" class="divide-y divide-slate-100 text-sm">
+                <!-- Se inyecta dinámicamente mediante app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VISTA 2: MAPA INTERACTIVO Y TARJETA DE DETALLE -->
+        <div id="map-results-view" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2">
+          
+          <!-- Tarjeta de detalle de la farmacia seleccionada (Columna Izquierda) -->
+          <div class="lg:col-span-4 w-full">
+            <div id="selected-pharmacy-card" class="mockup-card overflow-hidden sticky top-24">
+              <!-- Renderizado dinámico desde app.js -> selectPharmacy() -->
+            </div>
+          </div>
+
+          <!-- Mapa Georreferenciado Leaflet (Columna Derecha) -->
+          <div class="lg:col-span-8 w-full">
+            <div class="mockup-card overflow-hidden relative shadow-md">
+              <!-- Pill flotante informativo sobre el mapa -->
+              <div class="absolute top-4 left-1/2 -translate-x-1/2 z-[400] bg-white/95 backdrop-blur-sm border border-slate-200 shadow-md rounded-full px-4 py-1.5 text-xs font-semibold text-slate-700 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-sky-500 animate-ping"></span>
+                <span>Área de cobertura activa: Bogotá (Localidad Kennedy)</span>
+              </div>
+              <div id="leaflet-map"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ======================================================================
+         SECCIÓN 4: ¿CÓMO FUNCIONA? (PROCESO EN 3 PASOS)
+         ====================================================================== -->
+    <section id="como-funciona" class="bg-gradient-to-b from-white to-sky-50/50 py-16 border-y border-slate-200/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        
+        <!-- Título de sección -->
+        <div class="text-center max-w-3xl mx-auto space-y-3">
+          <span class="inline-block bg-sky-100 text-sky-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full">
+            Paso a Paso
+          </span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900">
+            ¿Cómo funciona MediDisponible?
+          </h2>
+          <p class="text-slate-600 text-sm sm:text-base">
+            Consultar tus medicamentos formulados es muy fácil. Sigue estos tres pasos sencillos:
+          </p>
+        </div>
+
+        <!-- Tarjeta del proceso con fotografía del farmacéutico (Mockup Layout) -->
+        <div class="max-w-5xl mx-auto mockup-card overflow-hidden shadow-lg">
+          <div class="grid grid-cols-1 md:grid-cols-12">
+            
+            <!-- Fotografía de referencia -->
+            <div class="md:col-span-5 bg-slate-100 relative min-h-[300px]">
+              <img src="assets/how-it-works-pharmacist.jpg" alt="Farmacéutico profesional consultando inventario en tablet" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent md:hidden"></div>
+              <div class="absolute bottom-4 left-4 right-4 text-white md:hidden">
+                <p class="text-xs font-semibold uppercase tracking-wider text-sky-300">Asistencia Informada</p>
+                <p class="text-sm font-bold">Verificación previa en puntos de entrega</p>
+              </div>
+            </div>
+
+            <!-- Lista interactiva de pasos -->
+            <div class="md:col-span-7 p-6 sm:p-10 flex flex-col justify-center space-y-6">
+              
+              <!-- Paso 1 -->
+              <div class="flex items-start gap-4">
+                <div class="step-number-badge">1</div>
+                <div>
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900">Busca tu medicamento</h3>
+                  <p class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                    Escribe el nombre del medicamento, selecciona su concentración o presentación médica prescrita.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Paso 2 -->
+              <div class="flex items-start gap-4">
+                <div class="step-number-badge">2</div>
+                <div>
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900">Consulta los resultados</h3>
+                  <p class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                    Revisa en la tabla o en el mapa interactivo los posibles puntos de dispensación que reportan existencias.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Paso 3 -->
+              <div class="flex items-start gap-4">
+                <div class="step-number-badge">3</div>
+                <div>
+                  <h3 class="text-base sm:text-lg font-bold text-slate-900">Encuentra dónde reclamarlo</h3>
+                  <p class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+                    Consulta la dirección, horario de atención y traza la ruta directa con Google Maps antes de desplazarte.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Botón de acción al pie de pasos -->
+        <div class="text-center space-y-4 max-w-xl mx-auto">
+          <a href="#buscar" class="btn-primary px-10 py-3.5 text-base font-semibold shadow-md">
+            Comenzar mi consulta ahora
+          </a>
+          <p class="text-xs text-slate-500">
+            La información es orientativa. Te recomendamos verificar telefónicamente antes de salir.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ======================================================================
+         SECCIÓN 5: PREGUNTAS FRECUENTES (FAQ & ACORDEÓN)
+         ====================================================================== -->
+    <section id="faq" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      
+      <!-- Título de la sección -->
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <span class="inline-block bg-sky-100 text-sky-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full">
+          Resolución de Dudas
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900">
+          ¿Necesitas ayuda?
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base">
+          Encuentra respuestas inmediatas a las inquietudes más comunes sobre el uso de la plataforma.
+        </p>
+      </div>
+
+      <!-- Cuadrícula con las 4 tarjetas con foto del Mockup de Figma -->
+      <div id="faq-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <!-- Renderizado dinámico desde app.js -> initFAQ() -->
+      </div>
+
+      <!-- Acordeón interactivo para lectura directa en la página sin abrir modal -->
+      <div class="max-w-3xl mx-auto space-y-3 pt-6">
+        <h3 class="text-lg font-bold text-slate-800 text-center mb-4">Preguntas rápidas frecuentes</h3>
+        <div id="faq-accordion-container" class="space-y-3">
+          <!-- Renderizado dinámico desde app.js -->
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ======================================================================
+         SECCIÓN 6: CONTACTO, ATENCIÓN DIRECTA Y SOPORTE
+         ====================================================================== -->
+    <section id="contacto" class="bg-slate-50 py-16 border-t border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        
+        <!-- Encabezado de la sección -->
+        <div class="text-center max-w-3xl mx-auto space-y-3">
+          <span class="inline-block bg-sky-100 text-sky-800 text-xs font-bold uppercase tracking-wider px-3.5 py-1 rounded-full">
+            Canales de Atención
+          </span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900">
+            ¿Aún tienes dudas? Contáctanos
+          </h2>
+          <p class="text-slate-600 text-sm sm:text-base">
+            Déjanos tu mensaje y nuestro equipo de soporte te responderá a la mayor brevedad.
+          </p>
+        </div>
+
+        <!-- Contenedor del Formulario y Tarjeta de Información Directa -->
+        <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Formulario de Contacto (Columna Izquierda) -->
+          <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200">
+            <form id="support-contact-form" class="space-y-4">
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="contact-name" class="block text-xs font-bold text-sky-700 uppercase mb-1">Nombre *</label>
+                  <input type="text" id="contact-name" required placeholder="Tu nombre" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-400 text-sm">
+                </div>
+                <div>
+                  <label for="contact-lastname" class="block text-xs font-bold text-sky-700 uppercase mb-1">Apellido</label>
+                  <input type="text" id="contact-lastname" placeholder="Tu apellido" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-400 text-sm">
+                </div>
+              </div>
+
+              <div>
+                <label for="contact-email" class="block text-xs font-bold text-sky-700 uppercase mb-1">Correo electrónico *</label>
+                <input type="email" id="contact-email" required placeholder="ejemplo@correo.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-400 text-sm">
+              </div>
+
+              <div>
+                <label for="contact-title" class="block text-xs font-bold text-sky-700 uppercase mb-1">Título / Asunto</label>
+                <input type="text" id="contact-title" placeholder="¿Sobre qué deseas consultar?" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-400 text-sm">
+              </div>
+
+              <div>
+                <label for="contact-message" class="block text-xs font-bold text-sky-700 uppercase mb-1">Mensaje *</label>
+                <textarea id="contact-message" rows="4" required placeholder="Escribe aquí tu consulta o comentario..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-400 text-sm resize-none"></textarea>
+              </div>
+
+              <div class="flex items-start gap-2 pt-1">
+                <input type="checkbox" id="terms-agree" required class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-gray-300 mt-0.5">
+                <label for="terms-agree" class="text-xs text-slate-600 cursor-pointer">
+                  Acepto los términos y condiciones de tratamiento de datos personales.
+                </label>
+              </div>
+
+              <div class="pt-2">
+                <button type="submit" class="w-full sm:w-auto btn-amber px-8 py-3 text-sm font-semibold shadow-md">
+                  Enviar mensaje
+                </button>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- Tarjeta de Información de Contacto Directa (Columna Derecha, Azul del Mockup) -->
+          <div class="lg:col-span-5 contact-info-card p-8 rounded-3xl space-y-8">
+            
+            <!-- Insignia interna con logo -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-center">
+              <img src="assets/hero-logo-badge.jpg" alt="MediDisponible" class="max-h-20 w-auto object-contain">
+            </div>
+
+            <!-- Datos de contacto -->
+            <div class="space-y-6 text-sm">
+              
+              <!-- Teléfono -->
+              <div class="flex items-center gap-4">
+                <div class="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                </div>
+                <div>
+                  <p class="text-xs text-white/80 uppercase font-semibold">Línea telefónica</p>
+                  <p class="font-bold text-base text-white">322 339 85 38</p>
+                </div>
+              </div>
+
+              <!-- Correo electrónico -->
+              <div class="flex items-center gap-4">
+                <div class="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                  <p class="text-xs text-white/80 uppercase font-semibold">Correo de contacto</p>
+                  <p class="font-bold text-base text-white break-all">contacto@medidisponible.com</p>
+                </div>
+              </div>
+
+              <!-- Dirección física -->
+              <div class="flex items-center gap-4">
+                <div class="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-xs text-white/80 uppercase font-semibold">Oficina central</p>
+                  <p class="font-bold text-base text-white">Cra 43 # 13 - 85, Bogotá</p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Horario de atención -->
+            <div class="pt-4 border-t border-white/20 text-xs text-white/90">
+              <p><strong>Horario de atención soporte:</strong></p>
+              <p>Lunes a Viernes de 8:00 AM a 6:00 PM</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ==========================================================================
+       PIE DE PÁGINA (LANDING PAGE FOOTER)
+       ========================================================================== -->
+  <footer class="w-full bg-white border-t border-slate-200 py-10 z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        
+        <!-- Logotipo y lema del footer -->
+        <div class="flex flex-col items-center md:items-start gap-2">
+          <img src="assets/logo-header.png" alt="MediDisponible" class="h-10 w-auto">
+          <p class="text-xs text-slate-500 text-center md:text-left max-w-sm">
+            Facilitando el acceso a información de disponibilidad de medicamentos en Colombia.
+          </p>
+        </div>
+
+        <!-- Enlaces directos a las secciones de la Landing Page -->
+        <div class="flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm text-slate-600 font-medium">
+          <a href="#inicio" class="hover:text-sky-600 transition">Inicio</a>
+          <a href="#beneficios" class="hover:text-sky-600 transition">Beneficios</a>
+          <a href="#buscar" class="hover:text-sky-600 transition">Buscador</a>
+          <a href="#como-funciona" class="hover:text-sky-600 transition">¿Cómo funciona?</a>
+          <a href="#faq" class="hover:text-sky-600 transition">Preguntas Frecuentes</a>
+          <a href="#contacto" class="hover:text-sky-600 transition">Contacto</a>
+        </div>
+
+        <!-- Íconos de redes sociales del Figma Mockup -->
+        <div class="flex items-center gap-3">
+          <!-- Instagram -->
+          <a href="#" class="w-9 h-9 rounded-full border border-sky-400 text-sky-500 flex items-center justify-center hover:bg-sky-50 transition" title="Instagram" aria-label="Instagram">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <!-- Web Institucional -->
+          <a href="https://headless-stdqpouqxjz-rgestevenson-140c.wix-site-host.com/" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full border border-sky-400 text-sky-500 flex items-center justify-center hover:bg-sky-50 transition" title="Sitio Web Wix" aria-label="Sitio Web">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+          </a>
+          <!-- Twitter / X -->
+          <a href="#" class="w-9 h-9 rounded-full border border-sky-400 text-sky-500 flex items-center justify-center hover:bg-sky-50 transition" title="Twitter / X" aria-label="Twitter">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <!-- YouTube -->
+          <a href="#" class="w-9 h-9 rounded-full border border-sky-400 text-sky-500 flex items-center justify-center hover:bg-sky-50 transition" title="YouTube" aria-label="YouTube">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Texto legal y derechos de autor -->
+      <div class="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
+        <p>&copy; Información MediDisponible 2026. Todos los derechos reservados.</p>
+        <p>Iniciativa tecnológica para la optimización de acceso a medicamentos.</p>
+      </div>
+
+    </div>
+  </footer>
+
+
+  <!-- ==========================================================================
+       BOTÓN FLOTANTE: VOLVER ARRIBA (BACK TO TOP)
+       ========================================================================== -->
+  <button id="back-to-top-btn" class="back-to-top-btn" title="Volver al inicio" aria-label="Volver arriba">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+    </svg>
+  </button>
+
+
+  <!-- ==========================================================================
+       MODAL: MENSAJE DE CONFIRMACIÓN DE CONTACTO (FIGMA MOCKUP)
+       ========================================================================== -->
+  <div id="contact-success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" role="dialog" aria-modal="true" aria-labelledby="success-modal-title">
+    <div class="modal-container bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-md w-full relative text-center space-y-4">
+      
+      <!-- Botón de cerrar modal -->
+      <button onclick="closeSuccessModal()" class="absolute top-4 right-4 text-white/80 hover:text-white text-2xl font-bold focus:outline-none" aria-label="Cerrar modal">&times;</button>
+      
+      <!-- Ícono de check de éxito -->
+      <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto shadow-inner">
+        <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+      </div>
+
+      <h3 id="success-modal-title" class="text-2xl font-bold">¡Mensaje Enviado!</h3>
+      <p class="text-white/95 text-sm sm:text-base leading-relaxed">
+        Gracias por tu mensaje. Nuestro equipo revisará tu solicitud y se pondrá en contacto contigo a la brevedad.
+      </p>
+
+      <div class="pt-2">
+        <button onclick="closeSuccessModal()" class="bg-white text-sky-700 font-bold px-8 py-3 rounded-full text-sm hover:bg-sky-50 transition shadow-lg">
+          Entendido
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ==========================================================================
+       MODAL GENÉRICO: DETALLE DE FARMACIA Y LECTURA EXTENDIDA DE FAQ
+       ========================================================================== -->
+  <div id="generic-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" role="dialog" aria-modal="true">
+    <div class="modal-container bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-2xl w-full relative max-h-[90vh] overflow-y-auto border border-slate-100">
+      <button onclick="closeGenericModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-3xl font-bold focus:outline-none" aria-label="Cerrar">&times;</button>
+      
+      <div id="modal-body-content">
+        <!-- Inyección dinámica de contenido desde JavaScript -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==========================================================================
+       SCRIPT PRINCIPAL DE LA APLICACIÓN
+       ========================================================================== -->
+  <script src="app.js"></script>
+
+</body>
+</html>
